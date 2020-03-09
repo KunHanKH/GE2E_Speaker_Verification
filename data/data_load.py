@@ -48,7 +48,7 @@ class SpeechDataset(Dataset):
         return utter_per_speaker
 
 # dataset = SpeechDataset()
-# dataloader = DataLoader(dataset, batch_size=dataset.train_config.N)
+# dataloader = DataLoader(dataset, batch_size=dataset.train_config.N, shuffle=False, drop_last=True)
 # for i, batch in enumerate(dataloader):
 #     print(batch.shape)
 

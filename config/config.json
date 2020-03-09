@@ -48,13 +48,15 @@
       "hidden": 128,
       "num_layer": 3,
       "proj": 64,
-      "model_path": "./model/tdsv/model.model"
+      "model_path": "./model/tdsv/model.model",
+      "loss": "contrast"
     },
     "TI_SV_model": {
       "hidden": 768,
       "num_layer": 3,
       "proj": 256,
-      "model_path": "./model/tisv/model.model"
+      "model_path": "./model/tisv/model.model",
+      "loss": "softmax"
     }
   },
   "train": {
