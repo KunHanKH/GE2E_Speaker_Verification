@@ -1,0 +1,100 @@
+{
+  "key_word": false,
+  "training": true,
+  "device": "cuda",
+  "data": {
+    "TD_SV_data":{
+      "unprocessed_dir": "../dataset/Snips",
+      "unprocessed_data": "../dataset/Snips/*/*/*.wav",
+
+      "train_path_unprocessed": "../dataset/Snips/train/*/*.wav",
+      "train_path_processed": "../dataset/processed/tdsv/train",
+
+      "test_path_unprocessed": "../dataset/Snips/test/*/*.wav",
+      "test_path_processed": "../dataset/processed/tdsv/test",
+
+      "data_processed": true,
+      "sr": 16000,
+      "nfft": 512,
+      "window": 0.025,
+      "hop": 0.01,
+      "nmels": 40,
+      "frame": 80,
+      "duration": 0.825
+    },
+    "TI_SV_data": {
+      "unprocessed_dir": "../dataset/TIMIT",
+      "unprocessed_data": "../dataset/TIMIT/*/*/*/*.wav",
+
+      "train_path_unprocessed": "../dataset/TIMIT/TRAIN/*/*/*.wav",
+      "train_path_processed": "../dataset/processed/tisv/train",
+
+      "test_path_unprocessed": "../dataset/TIMIT/TEST/*/*/*.wav",
+      "test_path_processed": "../dataset/processed/tisv/test",
+
+      "data_processed": true,
+      "sr": 16000,
+      "nfft": 512,
+      "window": 0.025,
+      "hop": 0.01,
+      "nmels": 40,
+      "frame_low": 160,
+      "frame": 180,
+      "duration": 2.05
+    }
+  },
+  "model": {
+    "TD_SV_model": {
+      "hidden": 128,
+      "num_layer": 3,
+      "proj": 64,
+      "model_path": "./model/tdsv/model.model"
+    },
+    "TI_SV_model": {
+      "hidden": 768,
+      "num_layer": 3,
+      "proj": 256,
+      "model_path": "./model/tisv/model.model"
+    }
+  },
+  "train": {
+    "TD_SV_train": {
+      "N": 64,
+      "M": 10,
+      "num_workers": 0,
+      "lr": 0.01,
+      "epochs": 950,
+      "log_intervals": 30,
+      "log_file": "./log/tdsv/log.log",
+      "checkpoint_interval": 120,
+      "checkpoint_dir": "./checkpoint/tdsv/",
+      "restore": false
+    },
+    "TI_SV_train": {
+      "N": 64,
+      "M": 10,
+      "num_workers": 0,
+      "lr": 0.01,
+      "epochs": 950,
+      "log_intervals": 30,
+      "log_file": "./log/tisv/log.log",
+      "checkpoint_interval": 120,
+      "checkpoint_dir": "./checkpoint/tisv/",
+      "restore": false
+    }
+  },
+  "test": {
+    "TD_SV_test": {
+      "N": 4,
+      "M": 5,
+      "num_workers": 8,
+      "epochs": 10
+    },
+    "TI_SV_test": {
+      "N": 4,
+      "M": 5,
+      "num_workers": 8,
+      "epochs": 10
+    }
+  }
+}
