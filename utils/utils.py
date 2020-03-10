@@ -29,7 +29,7 @@ def STFT_mel_audio_data(data_config, raw_utter):
     assert S.shape[0] >= data_config.frame, "can't generate 80 frames."
     return S # -> shape [num_frame, data_config.nmel]
 
-def get_centroid_include_self(embedding):
+def calculate_centroid_include_self(embedding):
     '''
     calculate centroid embedding. For each embedding, include itself inside the calculation.
     :param embedding: shape -> (N, M, feature_dim)
@@ -40,7 +40,7 @@ def get_centroid_include_self(embedding):
     embedding_mean = torch.mean(embedding, dim=1)
     return embedding_mean
 
-def get_centroid_exclude_self(embedding):
+def calculate_centroid_exclude_self(embedding):
     '''
     calculate centroid embedding. For each embedding, exclude itself inside the calculation.
     :param embedding: shape -> (N, M, feature_dim)
@@ -52,7 +52,7 @@ def get_centroid_exclude_self(embedding):
     embedding_mean = (embedding_sum - embedding) / (M-1)
     return embedding_mean
 
-def get_similarity_include_self(embedding, centroid_embedding):
+def calculate_similarity(embedding, centroid_embedding):
     '''
     calculate similarity S_jik
     :param embedding: shape -> (N, M, feature_dim)
@@ -70,7 +70,7 @@ def get_similarity_include_self(embedding, centroid_embedding):
     similarity = F.cosine_similarity(embedding, centroid_embedding, dim=3)
     return similarity
 
-def get_similarity_exclude_self(embedding, centroid_embedding):
+def calculate_similarity_j_equal_k(embedding, centroid_embedding):
     '''
     calculate cimilarity S_jik for j == k
     :param embedding: shape -> (N, M, feature)
@@ -85,6 +85,11 @@ def get_similarity_exclude_self(embedding, centroid_embedding):
     similarity = F.cosine_similarity(embedding, centroid_embedding, dim=2)
     return similarity
 
+def combine_similarity(similarity, similarity_j_equal_k):
+    same_index = list(range(similarity.shape[0]))
+    similarity[same_index, :, same_index] = similarity_j_equal_k[same_index, :]
+    return similarity
+
 def get_similarity(embedding):
     '''
     get similarity for input embedding
@@ -92,17 +97,29 @@ def get_similarity(embedding):
     :return:
     similarity: shape -> (N, M, N)
     '''
-    embedding_mean_include = get_centroid_include_self(embedding)
-    embedding_mean_exclude = get_centroid_exclude_self(embedding)
+    embedding_mean_include = calculate_centroid_include_self(embedding)
+    embedding_mean_exclude = calculate_centroid_exclude_self(embedding)
 
-    similarity_include = get_similarity_include_self(embedding, embedding_mean_include) # shape (N, M, N)
-    similarity_exclude = get_similarity_exclude_self(embedding, embedding_mean_exclude) # shape (N, M)
+    similarity = calculate_similarity(embedding, embedding_mean_include) # shape (N, M, N)
+    similarity_j_equal_k = calculate_similarity_j_equal_k(embedding, embedding_mean_exclude) # shape (N, M)
 
-    similarity = similarity_include
-    same_index = list(range(similarity.shape[0]))
-    similarity[same_index, :, same_index] = similarity_exclude[same_index, :]
+    similarity = combine_similarity(similarity, similarity_j_equal_k)
 
     return similarity
+
+def get_similarity_eva(enrollment_embedding, evaluation_embedding):
+    '''
+    get similarity score for evaluation
+    :param enrollment_embedding: shape -> (N, M_1, feature_dim)
+    :param evaluation_embedding: shape -> (N, M_2, feature_dim)
+    :return:
+    similarity: shape -> (N, M_2, N)
+    '''
+
+    enrollment_embedding_mean = calculate_centroid_include_self(enrollment_embedding) # shape -> (N, feature_dim)
+    similarity = calculate_similarity(evaluation_embedding, enrollment_embedding_mean) # shape (N, M_2, N)
+    return similarity
+
 
 def get_contrast_loss(similarity):
     '''
@@ -111,7 +128,11 @@ def get_contrast_loss(similarity):
     :return:
     loss = sum_ji(L(e_ji))
     '''
-    sigmoid = torch.sigmoid(similarity)
+
+    # some inplace operation
+    # one of the variables needed for gradient computation has been modified by an inplace operation
+    # so I choose to implement myself
+    sigmoid = 1 / (1 + torch.exp(-similarity))
     same_index = list(range(similarity.shape[0]))
     loss_1 = torch.sum(1-sigmoid[same_index, :, same_index])
     sigmoid[same_index, :, same_index] = 0
@@ -130,3 +151,45 @@ def get_softmax_loss(similarity):
     same_index = list(range(similarity.shape[0]))
     loss = torch.sum(torch.log(torch.sum(torch.exp(similarity), dim=2) + 1e-6)) - torch.sum(similarity[same_index, :, same_index])
     return loss
+
+def get_EER(similarity):
+    '''
+    calculate EER
+    :param similarity: shape -> (N, M, N)
+    :return:
+    EER with smallest diff between FAR and FRR
+    '''
+    N, M, _ = similarity.shape
+
+    FRR_log = []
+    FAR_log = []
+    EER_log = []
+    diff_log = []
+    thresh_log = []
+    same_index = list(range(N))
+    for thresh in [0.5 + 0.05 * i for i in range(10)]:
+        sim_thresh_pass = (similarity >= thresh).float()
+        sim_thresh_fail = (similarity < thresh).float()
+
+        # calculate FRR: false rejection rate
+        FRR = (torch.sum(sim_thresh_fail[same_index, :, same_index])) / (N*M)
+
+        # calculate FAR: false acceptance rate
+        FAR = (torch.sum(sim_thresh_pass) - torch.sum(sim_thresh_pass[same_index, :, same_index])) / ((N-1)*N*M)
+
+        EER = (FRR+FAR)/2
+        diff = abs(FRR-FAR)
+
+        FRR_log.append(FRR.item())
+        FAR_log.append(FAR.item())
+        EER_log.append(EER.item())
+        diff_log.append(diff.item())
+        thresh_log.append(thresh)
+
+    diff_log = np.array(diff_log)
+    argmin = np.argmin(diff_log)
+    # print("diff_log: \n", diff_log)
+    # print("FRR_log: \n", FRR_log)
+    # print("FAR_log: \n", FAR_log)
+    # print("EER_log: \n", EER_log)
+    return EER_log[argmin], FRR_log[argmin], FAR_log[argmin], thresh_log[argmin]

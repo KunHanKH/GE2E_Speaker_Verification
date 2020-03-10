@@ -14,7 +14,7 @@ from utils.parse_config import config_param
 from data.data_load import SpeechDataset
 from model.net import SpeechEmbedder
 from model.loss import GE2ELoss
-
+torch.autograd.set_detect_anomaly(True)
 
 def train(model_path=None):
 
@@ -29,7 +29,7 @@ def train(model_path=None):
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-    # load dataset
+    # load train dataset and dataloader
     train_set = SpeechDataset()
     train_loader = DataLoader(train_set, batch_size=train_config.N, shuffle=False, drop_last=True)
 
@@ -53,13 +53,18 @@ def train(model_path=None):
     # create file directory for saving training results.
     os.makedirs(train_config.checkpoint_dir, exist_ok=True)
     os.makedirs(os.path.dirname(train_config.log_file), exist_ok=True)
+    os.makedirs(os.path.dirname(train_config.model_path), exist_ok=True)
+
 
     # start train
     speech_embedder.train()
     loss_log = []
     total_loss_log = []
     iteration = 0
+
     for e in range(train_config.epochs):
+        # Because dataloader drop last batch, so we shuffle all data in case some data will never be used
+        train_set.shuffle()
         total_loss = 0
         for batch_id, batch in enumerate(train_loader):
 
@@ -121,13 +126,10 @@ def train(model_path=None):
     # save final model
     speech_embedder.eval().cpu()
     ge2e_loss.eval().cpu()
-    ckpt_model_filename = "final_epoch_" + str(e + 1) + "_batch_id_" + str(batch_id + 1) + ".model"
-    ckpt_model_path = os.path.join(train_config.checkpoint_dir, ckpt_model_filename)
-    torch.save({'speech_embedder': speech_embedder.state_dict(), 'ge2e_loss': ge2e_loss.state_dict()}, ckpt_model_path)
+    torch.save({'speech_embedder': speech_embedder.state_dict(), 'ge2e_loss': ge2e_loss.state_dict()}, train_config.model_path)
     # save loss log
-    loss_log_path = os.path.join(train_config.checkpoint_dir, "loss_log.log")
-    torch.save({'loss':loss_log, 'total_loss':total_loss_log}, loss_log_path)
-    print("\nDone, trained model saved at", ckpt_model_path)
+    torch.save({'loss':loss_log, 'total_loss':total_loss_log}, train_config.loss_log_file)
+    print("\nDone, trained model saved at", train_config.loss_log_file)
 
 
 if __name__ == "__main__":

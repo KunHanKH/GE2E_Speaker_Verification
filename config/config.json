@@ -1,5 +1,5 @@
 {
-  "key_word": false,
+  "key_word": true,
   "training": true,
   "device": "cuda",
   "data": {
@@ -68,8 +68,10 @@
       "epochs": 950,
       "log_intervals": 30,
       "log_file": "../log/tdsv/log.log",
+      "loss_log_file": "../log/tdsv/loss.log",
       "checkpoint_interval": 120,
       "checkpoint_dir": "../checkpoint/tdsv/",
+      "model_path": "../model/tdsv/model.model",
       "restore": false
     },
     "TI_SV_train": {
@@ -80,23 +82,29 @@
       "epochs": 950,
       "log_intervals": 30,
       "log_file": "../log/tisv/log.log",
+      "loss_log_file": "../log/tisv/loss.log",
       "checkpoint_interval": 120,
       "checkpoint_dir": "../checkpoint/tisv/",
+      "model_path": "../model/tisv/model.model",
       "restore": false
     }
   },
   "test": {
     "TD_SV_test": {
       "N": 4,
-      "M": 5,
+      "M": 10,
       "num_workers": 8,
-      "epochs": 10
+      "epochs": 10,
+      "model_path": "../model/tdsv/model.model",
+      "EER_log_file": "../EER_log/tdsv/EER_log.log"
     },
     "TI_SV_test": {
       "N": 4,
-      "M": 5,
+      "M": 10,
       "num_workers": 8,
-      "epochs": 10
+      "epochs": 10,
+      "model_path": "../model/tisv/model.model",
+      "EER_log_file": "../EER_log/tisv/EER_log.log"
     }
   }
 }

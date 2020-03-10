@@ -25,10 +25,15 @@ class SpeechDataset(Dataset):
         else:
             self.path = self.data_config.test_path_processed
 
-        self.speaker_paths = [os.path.join(self.path, speaker) for speaker in os.listdir(self.path)]
+        self.speaker_paths = list([os.path.join(self.path, speaker) for speaker in os.listdir(self.path)])
+
+        self.length = len(self.speaker_paths)
+
+    def shuffle(self):
+        self.speaker_paths = random.sample(self.speaker_paths, self.length)
 
     def __len__(self):
-        return len(self.speaker_paths)
+        return self.length
 
     def __getitem__(self, idx):
 
@@ -38,13 +43,14 @@ class SpeechDataset(Dataset):
         else:
             self.frame_length = self.data_config.frame
 
-        selected_speaker_path = random.sample(self.speaker_paths, 1)[0]
+        selected_speaker_path = self.speaker_paths[idx]
 
         utter_per_speaker = np.load(selected_speaker_path)
         shuffle_index = np.random.randint(0, utter_per_speaker.shape[0], self.train_config.M)
         utter_per_speaker = utter_per_speaker[shuffle_index]
         utter_per_speaker = utter_per_speaker[:, :self.frame_length]
         utter_per_speaker = torch.tensor(utter_per_speaker)
+
         return utter_per_speaker
 
 # dataset = SpeechDataset()
