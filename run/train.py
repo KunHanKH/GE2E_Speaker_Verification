@@ -56,6 +56,8 @@ def train(model_path=None):
 
     # start train
     speech_embedder.train()
+    loss_log = []
+    total_loss_log = []
     iteration = 0
     for e in range(train_config.epochs):
         total_loss = 0
@@ -89,6 +91,8 @@ def train(model_path=None):
             optimizer.step()
 
             total_loss += loss
+            loss_log.append(loss.item())
+            total_loss_log.append(total_loss.item() / (batch_id + 1))
 
             # print training loss every interval batches
             if (batch_id + 1) % train_config.log_intervals == 0:
@@ -120,6 +124,7 @@ def train(model_path=None):
     ckpt_model_filename = "final_epoch_" + str(e + 1) + "_batch_id_" + str(batch_id + 1) + ".model"
     ckpt_model_path = os.path.join(train_config.checkpoint_dir, ckpt_model_filename)
     torch.save({'speech_embedder': speech_embedder.state_dict(), 'ge2e_loss': ge2e_loss.state_dict()}, ckpt_model_path)
+    torch.save({'loss':loss_log, 'total_loss':total_loss_log}, loss_log_path)
     print("\nDone, trained model saved at", ckpt_model_path)
 
 
