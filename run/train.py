@@ -124,6 +124,8 @@ def train(model_path=None):
     ckpt_model_filename = "final_epoch_" + str(e + 1) + "_batch_id_" + str(batch_id + 1) + ".model"
     ckpt_model_path = os.path.join(train_config.checkpoint_dir, ckpt_model_filename)
     torch.save({'speech_embedder': speech_embedder.state_dict(), 'ge2e_loss': ge2e_loss.state_dict()}, ckpt_model_path)
+    # save loss log
+    loss_log_path = os.path.join(train_config.checkpoint_dir, "loss_log.log")
     torch.save({'loss':loss_log, 'total_loss':total_loss_log}, loss_log_path)
     print("\nDone, trained model saved at", ckpt_model_path)
 
