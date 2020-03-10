@@ -48,14 +48,14 @@
       "hidden": 128,
       "num_layer": 3,
       "proj": 64,
-      "model_path": "./model/tdsv/model.model",
+      "model_path": "../model/tdsv/model.model",
       "loss": "contrast"
     },
     "TI_SV_model": {
       "hidden": 768,
       "num_layer": 3,
       "proj": 256,
-      "model_path": "./model/tisv/model.model",
+      "model_path": "../model/tisv/model.model",
       "loss": "softmax"
     }
   },
@@ -67,9 +67,9 @@
       "lr": 0.01,
       "epochs": 950,
       "log_intervals": 30,
-      "log_file": "./log/tdsv/log.log",
+      "log_file": "../log/tdsv/log.log",
       "checkpoint_interval": 120,
-      "checkpoint_dir": "./checkpoint/tdsv/",
+      "checkpoint_dir": "../checkpoint/tdsv/",
       "restore": false
     },
     "TI_SV_train": {
@@ -79,9 +79,9 @@
       "lr": 0.01,
       "epochs": 950,
       "log_intervals": 30,
-      "log_file": "./log/tisv/log.log",
+      "log_file": "../log/tisv/log.log",
       "checkpoint_interval": 120,
-      "checkpoint_dir": "./checkpoint/tisv/",
+      "checkpoint_dir": "../checkpoint/tisv/",
       "restore": false
     }
   },
