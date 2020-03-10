@@ -30,7 +30,7 @@ class SpeechEmbedder(nn.Module):
         return x
 
 
-test_input = torch.randn((100, 50, 40))
-net = SpeechEmbedder()
-embedder = net(test_input)
-print(embedder.shape)
+# test_input = torch.randn((100, 50, 40))
+# net = SpeechEmbedder()
+# embedder = net(test_input)
+# print(embedder.shape)

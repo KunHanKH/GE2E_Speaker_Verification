@@ -67,7 +67,6 @@ def get_similarity_include_self(embedding, centroid_embedding):
     centroid_embedding = centroid_embedding.unsqueeze(0).unsqueeze(0).expand(N, M, -1, -1)
     assert centroid_embedding.shape == (N, M, N, feature_dim), "centroid embedding has wrong expansion in get_similarity_include_self."
     embedding = embedding.unsqueeze(2)
-    print(embedding.shape, centroid_embedding.shape)
     similarity = F.cosine_similarity(embedding, centroid_embedding, dim=3)
     return similarity
 

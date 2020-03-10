@@ -61,7 +61,7 @@
   },
   "train": {
     "TD_SV_train": {
-      "N": 64,
+      "N": 4,
       "M": 10,
       "num_workers": 0,
       "lr": 0.01,
@@ -73,7 +73,7 @@
       "restore": false
     },
     "TI_SV_train": {
-      "N": 64,
+      "N": 4,
       "M": 10,
       "num_workers": 0,
       "lr": 0.01,

@@ -1,7 +1,7 @@
 {
 	"comment": "cp command can only be used in linux env, I use WSL to run parse_key_word_data.py",
-	"train_data_path": "/mnt/c/CodeSpase/GE2E_Speaker_Verification/dataset/hey_snips_research_6k_en_train_eval_clean_ter/train.json",
-	"dev_data_path": "/mnt/c/CodeSpase/GE2E_Speaker_Verification/dataset/hey_snips_research_6k_en_train_eval_clean_ter/dev.json",
-	"test_data_path": "/mnt/c/CodeSpase/GE2E_Speaker_Verification/dataset/hey_snips_research_6k_en_train_eval_clean_ter/test.json",
-	"data_dir": "/mnt/c/CodeSpase/GE2E_Speaker_Verification/dataset/hey_snips_research_6k_en_train_eval_clean_ter/"
+	"train_data_path": "../dataset/hey_snips_research_6k_en_train_eval_clean_ter/train.json",
+	"dev_data_path": "../dataset/hey_snips_research_6k_en_train_eval_clean_ter/dev.json",
+	"test_data_path": "../dataset/hey_snips_research_6k_en_train_eval_clean_ter/test.json",
+	"data_dir": "../dataset/hey_snips_research_6k_en_train_eval_clean_ter/"
 }
