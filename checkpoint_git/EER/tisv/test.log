@@ -1,0 +1,23 @@
+
+epoch 1 batch_id 30: EER : 0.00 (thres:0.60, FAR:0.00, FRR:0.00)
+epoch 1 batch_id 60: EER : 0.00 (thres:0.50, FAR:0.00, FRR:0.00)
+epoch 2 batch_id 30: EER : 0.01 (thres:0.55, FAR:0.01, FRR:0.00)
+epoch 2 batch_id 60: EER : 0.02 (thres:0.50, FAR:0.01, FRR:0.03)
+epoch 3 batch_id 30: EER : 0.02 (thres:0.55, FAR:0.01, FRR:0.03)
+epoch 3 batch_id 60: EER : 0.00 (thres:0.55, FAR:0.01, FRR:0.00)
+epoch 4 batch_id 30: EER : 0.00 (thres:0.60, FAR:0.00, FRR:0.00)
+epoch 4 batch_id 60: EER : 0.00 (thres:0.60, FAR:0.00, FRR:0.00)
+epoch 5 batch_id 30: EER : 0.02 (thres:0.50, FAR:0.02, FRR:0.03)
+epoch 5 batch_id 60: EER : 0.04 (thres:0.55, FAR:0.02, FRR:0.05)
+epoch 6 batch_id 30: EER : 0.00 (thres:0.55, FAR:0.00, FRR:0.00)
+epoch 6 batch_id 60: EER : 0.02 (thres:0.65, FAR:0.01, FRR:0.03)
+epoch 7 batch_id 30: EER : 0.00 (thres:0.55, FAR:0.00, FRR:0.00)
+epoch 7 batch_id 60: EER : 0.00 (thres:0.60, FAR:0.00, FRR:0.00)
+epoch 8 batch_id 30: EER : 0.03 (thres:0.55, FAR:0.03, FRR:0.03)
+epoch 8 batch_id 60: EER : 0.00 (thres:0.50, FAR:0.00, FRR:0.00)
+epoch 9 batch_id 30: EER : 0.00 (thres:0.50, FAR:0.00, FRR:0.00)
+epoch 9 batch_id 60: EER : 0.01 (thres:0.55, FAR:0.01, FRR:0.00)
+epoch 10 batch_id 30: EER : 0.01 (thres:0.50, FAR:0.00, FRR:0.03)
+epoch 10 batch_id 60: EER : 0.03 (thres:0.50, FAR:0.01, FRR:0.05)
+ EER across 10 epochs: 0.0097
+ EER across 10 epochs: 0.0574

@@ -45,15 +45,18 @@ def train(model_path=None):
 
     # set optimizer. For different component, set different gradient scale
     optimizer = torch.optim.SGD([
-        {'params': speech_embedder.LSTM.parameters(), 'lr': train_config.lr*0.5},
+        {'params': speech_embedder.LSTM_stack.parameters(), 'lr': train_config.lr*0.5},
         {'params': speech_embedder.projection.parameters(), 'lr': train_config.lr},
         {'params': ge2e_loss.parameters(), 'lr': train_config.lr*0.01}
     ])
 
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=800, gamma=0.5)
+
     # create file directory for saving training results.
     os.makedirs(train_config.checkpoint_dir, exist_ok=True)
     os.makedirs(os.path.dirname(train_config.log_file), exist_ok=True)
-    os.makedirs(os.path.dirname(train_config.model_path), exist_ok=True)
+    os.makedirs(os.path.dirname(train_config.final_model_path), exist_ok=True)
+    os.makedirs(os.path.dirname(train_config.optim_model_path), exist_ok=True)
 
 
     # start train
@@ -62,6 +65,7 @@ def train(model_path=None):
     total_loss_log = []
     iteration = 0
 
+    optim_loss = float("inf")
     for e in range(train_config.epochs):
         # Because dataloader drop last batch, so we shuffle all data in case some data will never be used
         train_set.shuffle()
@@ -99,6 +103,7 @@ def train(model_path=None):
             loss_log.append(loss.item())
             total_loss_log.append(total_loss.item() / (batch_id + 1))
 
+
             # print training loss every interval batches
             if (batch_id + 1) % train_config.log_intervals == 0:
                 mesg = "{0}\tEpoch:{1}[{2}/{3}],Iteration:{4}\tLoss:{5:.4f}\tTLoss:{6:.4f}\t\n".format(time.ctime(),
@@ -113,8 +118,16 @@ def train(model_path=None):
                 with open(train_config.log_file, 'a') as f:
                     f.write(mesg)
 
+        # after finishing one epoch
+        scheduler.step()
+        
+        if optim_loss > (total_loss.item()/(batch_id+1)):
+        	optim_loss = (total_loss.item()/(batch_id+1))
+        	print("Save model with optim loss {} in {}".format(optim_loss, train_config.optim_model_path))
+        	torch.save({'speech_embedder': speech_embedder.state_dict(), 'ge2e_loss': ge2e_loss.state_dict()}, train_config.optim_model_path)
+
         # save checkpoint every interval epochs
-        if (i+1) % train_config.log_intervals == 0:
+        if (e+1) % train_config.log_intervals == 0:
             speech_embedder.eval().cpu()
             ge2e_loss.eval().cpu()
             ckpt_model_filename = "ckpt_epoch_" + str(e+1) + "_batch_id_" + str(batch_id+1) + ".pth"
@@ -126,7 +139,7 @@ def train(model_path=None):
     # save final model
     speech_embedder.eval().cpu()
     ge2e_loss.eval().cpu()
-    torch.save({'speech_embedder': speech_embedder.state_dict(), 'ge2e_loss': ge2e_loss.state_dict()}, train_config.model_path)
+    torch.save({'speech_embedder': speech_embedder.state_dict(), 'ge2e_loss': ge2e_loss.state_dict()}, train_config.final_model_path)
     # save loss log
     torch.save({'loss':loss_log, 'total_loss':total_loss_log}, train_config.loss_log_file)
     print("\nDone, trained model saved at", train_config.loss_log_file)

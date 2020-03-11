@@ -28,7 +28,7 @@ def test(model_path):
         test_config = config_param.test.TD_SV_test
 
     if model_path == None:
-        model_path = test_config.model_path
+        model_path = test_config.final_model_path
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
@@ -41,19 +41,21 @@ def test(model_path):
     ge2e_loss = GE2ELoss().to(device)
 
     # restore model
-    speech_embedder.load_state_dict(torch.load(model_path))
+    # speech_embedder.load_state_dict(torch.load(model_path))
+    speech_embedder.load_state_dict(torch.load(model_path)['speech_embedder'])
+    ge2e_loss.load_state_dict(torch.load(model_path)['ge2e_loss'])
     print("successfully load model")
-    # speech_embedder.load_state_dict(torch.load(model_path)['speech_embedder'])
-    # ge2e_loss.load_state_dict(torch.load(model_path)['ge2e_loss'])
+
 
     os.makedirs(os.path.dirname(test_config.EER_log_file), exist_ok=True)
+    os.makedirs(os.path.dirname(test_config.log_file), exist_ok=True)
 
     speech_embedder.eval()
     ge2e_loss.eval()
 
     avg_EER = 0
     batch_avg_EER_log = []
-
+    avg_EER_log = []
     for e in range(test_config.epochs):
         # Because dataloader drop last batch, so we shuffle all data in case some data will never be used
         test_set.shuffle()
@@ -76,17 +78,28 @@ def test(model_path):
 
             EER, FRR, FAR, thresh =  get_EER(similarity)
             batch_avg_EER += EER
-            print("\nepoch %d batch_id %d: EER : %0.2f (thres:%0.2f, FAR:%0.2f, FRR:%0.2f)" % (e+1, batch_id+1, EER, thresh, FAR, FRR))
+            mesg = "\nepoch %d batch_id %d: EER : %0.2f (thres:%0.2f, FAR:%0.2f, FRR:%0.2f)" % (e+1, batch_id+1, EER, thresh, FAR, FRR)
+            print(mesg)
+            if (batch_id+1) % test_config.log_intervals == 0:
+                with open(test_config.log_file, 'a') as f:
+                        f.write(mesg)
 
         batch_avg_EER = batch_avg_EER / (batch_id + 1)
         batch_avg_EER_log.append(batch_avg_EER)
         avg_EER += batch_avg_EER
+        avg_EER_log.append(avg_EER/(e+1))
+
     avg_EER = avg_EER / test_config.epochs
+    avg_EER_log.append(avg_EER)
+    mesg = "\n EER across {0} epochs: {1:.4f}".format(test_config.epochs, avg_EER)
+    print(mesg)
+    with open(test_config.log_file, 'w') as f:
+        f.write(mesg)
 
-    EER_log = {"batch_avg_EER_log": batch_avg_EER_log, "avg_EER": avg_EER}
-
+    EER_log = {"batch_avg_EER_log": batch_avg_EER_log, "avg_EER_log": avg_EER_log}
     torch.save(EER_log, test_config.EER_log_file)
-    print("\n EER across {0} epochs: {1:.4f}".format(test_config.epochs, avg_EER))
+    
+
 
 
 if __name__ == "__main__":

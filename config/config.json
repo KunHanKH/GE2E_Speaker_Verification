@@ -1,16 +1,15 @@
 {
-  "key_word": true,
-  "training": true,
-  "device": "cuda",
+  "key_word": false,
+  "training": false,
   "data": {
     "TD_SV_data":{
-      "unprocessed_dir": "../dataset/Snips",
-      "unprocessed_data": "../dataset/Snips/*/*/*.wav",
+      "unprocessed_dir": "../dataset/GE2E_raw_dataset/Snips",
+      "unprocessed_data": "../dataset/GE2E_raw_dataset/Snips/*/*/*.wav",
 
-      "train_path_unprocessed": "../dataset/Snips/train/*/*.wav",
+      "train_path_unprocessed": "../dataset/GE2E_raw_dataset/Snips/train/*/*.wav",
       "train_path_processed": "../dataset/processed/tdsv/train",
 
-      "test_path_unprocessed": "../dataset/Snips/test/*/*.wav",
+      "test_path_unprocessed": "../dataset/GE2E_raw_dataset/Snips/test/*/*.wav",
       "test_path_processed": "../dataset/processed/tdsv/test",
 
       "data_processed": true,
@@ -23,13 +22,13 @@
       "duration": 0.825
     },
     "TI_SV_data": {
-      "unprocessed_dir": "../dataset/TIMIT",
-      "unprocessed_data": "../dataset/TIMIT/*/*/*/*.wav",
+      "unprocessed_dir": "../dataset/GE2E_raw_dataset/TIMIT",
+      "unprocessed_data": "../dataset/GE2E_raw_dataset/TIMIT/*/*/*/*.wav",
 
-      "train_path_unprocessed": "../dataset/TIMIT/TRAIN/*/*/*.wav",
+      "train_path_unprocessed": "../dataset/GE2E_raw_dataset/TIMIT/TRAIN/*/*/*.wav",
       "train_path_processed": "../dataset/processed/tisv/train",
 
-      "test_path_unprocessed": "../dataset/TIMIT/TEST/*/*/*.wav",
+      "test_path_unprocessed": "../dataset/GE2E_raw_dataset/TIMIT/TEST/*/*/*.wav",
       "test_path_processed": "../dataset/processed/tisv/test",
 
       "data_processed": true,
@@ -48,63 +47,73 @@
       "hidden": 128,
       "num_layer": 3,
       "proj": 64,
-      "model_path": "../model/tdsv/model.model",
+      "final_model_path": "../checkpoint/tdsv/final_model.model",
+      "optim_model_path": "../checkpoint/tdsv/optim_model.model",
       "loss": "contrast"
     },
     "TI_SV_model": {
       "hidden": 768,
       "num_layer": 3,
       "proj": 256,
-      "model_path": "../model/tisv/model.model",
+      "final_model_path": "../checkpoint/tisv/final_model.model",
+      "optim_model_path": "../checkpoint/tisv/optim_model.model",
       "loss": "softmax"
     }
   },
   "train": {
     "TD_SV_train": {
-      "N": 4,
+      "N": 8,
       "M": 10,
       "num_workers": 0,
       "lr": 0.01,
-      "epochs": 950,
+      "epochs": 2000,
       "log_intervals": 30,
-      "log_file": "../log/tdsv/log.log",
-      "loss_log_file": "../log/tdsv/loss.log",
+      "log_file": "../log/loss/tdsv/train.log",
+      "loss_log_file": "../log/loss/tdsv/loss.loss",
       "checkpoint_interval": 120,
       "checkpoint_dir": "../checkpoint/tdsv/",
-      "model_path": "../model/tdsv/model.model",
+      "final_model_path": "../checkpoint/tdsv/final_model.model",
+      "optim_model_path": "../checkpoint/tdsv/optim_model.model",
       "restore": false
     },
     "TI_SV_train": {
-      "N": 4,
+      "N": 8,
       "M": 10,
       "num_workers": 0,
       "lr": 0.01,
-      "epochs": 950,
+      "epochs": 2000,
       "log_intervals": 30,
-      "log_file": "../log/tisv/log.log",
-      "loss_log_file": "../log/tisv/loss.log",
+      "log_file": "../log/loss/tisv/train.log",
+      "loss_log_file": "../log/loss/tisv/loss.loss",
       "checkpoint_interval": 120,
       "checkpoint_dir": "../checkpoint/tisv/",
-      "model_path": "../model/tisv/model.model",
+      "final_model_path": "../checkpoint/tisv/final_model.model",
+      "optim_model_path": "../checkpoint/tisv/optim_model.model",
       "restore": false
     }
   },
   "test": {
     "TD_SV_test": {
-      "N": 4,
+      "N": 8,
       "M": 10,
       "num_workers": 8,
       "epochs": 10,
-      "model_path": "../model/tdsv/model.model",
-      "EER_log_file": "../EER_log/tdsv/EER_log.log"
+      "log_intervals": 30,
+      "final_model_path": "../checkpoint/tdsv/final_model.model",
+      "optim_model_path": "../checkpoint/tdsv/optim_model.model",
+      "log_file": "../log/EER/tdsv/test.log",
+      "EER_log_file": "../log/EER/tdsv/EER.eer"
     },
     "TI_SV_test": {
-      "N": 4,
+      "N": 8,
       "M": 10,
       "num_workers": 8,
       "epochs": 10,
-      "model_path": "../model/tisv/model.model",
-      "EER_log_file": "../EER_log/tisv/EER_log.log"
+      "log_intervals": 30,
+      "final_model_path": "../checkpoint/tisv/final_model.model",
+      "optim_model_path": "../checkpoint/tisv/optim_model.model",
+      "log_file": "../log/EER/tisv/test.log",
+      "EER_log_file": "../log/EER/tisv/EER.eer"
     }
   }
 }
